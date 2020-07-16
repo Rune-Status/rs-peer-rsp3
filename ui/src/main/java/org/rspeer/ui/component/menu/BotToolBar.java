@@ -88,7 +88,7 @@ public class BotToolBar extends JToolBar {
                 if (source == null) {
                     return;
                 }
-                Script currentScript = environment.getScriptController().getActive();
+                Script currentScript = environment.getScriptController().getPool().getActive();
                 if (currentScript == null) {
                     return;
                 }
