@@ -88,7 +88,7 @@ public class Multimap<K, V> {
         return old;
     }
 
-    public void accept(K key, Consumer<V> visitor) {
+    public void ifPresent(K key, Consumer<V> visitor) {
         for (V value : getOrDefault(key, Collections.emptySet())) {
             visitor.accept(value);
         }
