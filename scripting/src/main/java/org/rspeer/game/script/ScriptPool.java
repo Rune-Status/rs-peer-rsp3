@@ -1,5 +1,6 @@
 package org.rspeer.game.script;
 
+//TODO name?
 public class ScriptPool {
 
     private final Script primary;

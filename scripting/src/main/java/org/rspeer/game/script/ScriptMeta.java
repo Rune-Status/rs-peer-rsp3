@@ -13,4 +13,6 @@ public @interface ScriptMeta {
     String developer() default "";
 
     double version() default 1.0;
+
+    boolean passive() default false;
 }
