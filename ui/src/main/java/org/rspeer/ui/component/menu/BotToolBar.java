@@ -1,30 +1,36 @@
 package org.rspeer.ui.component.menu;
 
-import org.rspeer.environment.Environment;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import org.rspeer.environment.preferences.BotPreferences;
+import org.rspeer.event.EventDispatcher;
 import org.rspeer.event.Subscribe;
 import org.rspeer.game.script.Script;
+import org.rspeer.game.script.ScriptController;
 import org.rspeer.game.script.event.ScriptChangeEvent;
-import org.rspeer.game.script.loader.ScriptBundle;
-import org.rspeer.game.script.loader.ScriptLoaderProvider;
-import org.rspeer.game.script.loader.ScriptProvider;
 import org.rspeer.game.script.loader.ScriptSource;
+import org.rspeer.ui.BotFrame;
 import org.rspeer.ui.component.script.ScriptSelector;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class BotToolBar extends JToolBar {
 
     private final StartButton start;
     private final ReloadButton reload;
 
-    public BotToolBar(Environment environment) {
-        environment.getEventDispatcher().subscribe(this);
+    @Inject
+    public BotToolBar(@Named("BotDispatcher") EventDispatcher dispatcher, BotFrame frame,
+            BotPreferences preferences, ScriptController controller) {
+        dispatcher.subscribe(this);
 
         setFloatable(false);
 
         add(Box.createHorizontalGlue());
 
-        reload = new ReloadButton(environment);
+        this.reload = new ReloadButton(controller);
         add(reload);
 
         start = new StartButton();
@@ -32,15 +38,10 @@ public class BotToolBar extends JToolBar {
 
         start.addActionListener(e -> {
             if (start.getText().equals("Start")) {
-                ScriptSelector selector = new ScriptSelector(environment.getBotContext().getFrame(), environment);
+                ScriptSelector selector = new ScriptSelector(preferences, frame, controller);
                 selector.display();
             } else {
-                environment.getEventDispatcher().dispatch(new ScriptChangeEvent(
-                        environment.getScriptController().getSource(),
-                        Script.State.STOPPED,
-                        Script.State.RUNNING
-                ));
-                environment.getScriptController().stop();
+                controller.stop();
             }
         });
     }
@@ -76,38 +77,33 @@ public class BotToolBar extends JToolBar {
 
     public static class ReloadButton extends JButton {
 
-        public ReloadButton(Environment environment) {
+        public ReloadButton(ScriptController controller) {
             setText("Reload");
             setVisible(false);
             setFocusPainted(false);
             setBorderPainted(false);
             setContentAreaFilled(true);
             setFocusable(false);
-            addActionListener(e -> {
-                ScriptSource source = environment.getScriptController().getSource();
-                if (source == null) {
-                    return;
-                }
-                Script currentScript = environment.getScriptController().getPool().getActive();
-                if (currentScript == null) {
-                    return;
-                }
-                ScriptProvider loader = new ScriptLoaderProvider().get();
-                Script.State currentState = currentScript.getState();
-                environment.getEventDispatcher().dispatch(
-                        new ScriptChangeEvent(source, Script.State.STOPPED, currentState)
-                );
-                environment.getScriptController().stop();
+            addActionListener(new Action(controller));
+        }
 
-                ScriptBundle bundle = loader.load();
-                ScriptSource reloaded = bundle.findShallow(source);
-                if (reloaded != null) {
-                    environment.getScriptController().start(loader, reloaded);
-                    environment.getEventDispatcher().dispatch(
-                            new ScriptChangeEvent(reloaded, Script.State.RUNNING, Script.State.STOPPED)
-                    );
+        private class Action implements ActionListener {
+
+            private final ScriptController controller;
+
+            private Action(ScriptController controller) {
+                this.controller = controller;
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ScriptSource source = controller.getSource();
+                Script active = controller.getPool().getActive();
+                if (source != null && active != null) {
+                    controller.stop();
+                    controller.setReload(true);
                 }
-            });
+            }
         }
     }
 }

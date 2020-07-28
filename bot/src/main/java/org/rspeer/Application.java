@@ -16,10 +16,10 @@ public class Application {
     private static final Injector injector = Guice.createInjector(new ApplicationModule());
 
     @Inject
-    private BotFrame botFrame;
+    private BotFrame window;
 
     @Inject
-    private LoadGameWorker loadGameWorker;
+    private LoadGameWorker loader;
     
     public static void main(String[] args) {
         Application application = injector.getInstance(Application.class);
@@ -28,8 +28,8 @@ public class Application {
 
     public void start() {
         SwingUtilities.invokeLater(() -> {
-            botFrame.display();
-            loadGameWorker.execute();
+            window.display();
+            loader.execute();
         });
     }
 }

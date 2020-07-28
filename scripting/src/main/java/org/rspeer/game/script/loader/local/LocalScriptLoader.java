@@ -85,12 +85,9 @@ public class LocalScriptLoader implements ScriptProvider {
     }
 
     @Override
-    public Script define(ScriptSource source, EventDispatcher environmentDispatcher) {
+    public Script define(ScriptSource source) {
         try {
-            Script script = source.getTarget().getDeclaredConstructor().newInstance();
-            script.setEnvironmentDispatcher(environmentDispatcher);
-            script.setSource(source);
-            return script;
+            return source.getTarget().getDeclaredConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             return null;
         }

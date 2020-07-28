@@ -14,7 +14,8 @@ public class ApplicationModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(EventDispatcher.class).annotatedWith(Names.named("BotDispatcher"))
+        bind(EventDispatcher.class)
+                .annotatedWith(Names.named("BotDispatcher"))
                 .toInstance(EventDispatcher.Factory.getDefault("bot"));
 
         bind(ScriptController.class).asEagerSingleton();

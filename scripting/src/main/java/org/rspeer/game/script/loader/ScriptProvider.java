@@ -14,7 +14,7 @@ public interface ScriptProvider extends Predicate<Class<?>> {
         return new ScriptBundle();
     }
 
-    Script define(ScriptSource source, EventDispatcher environmentDispatcher);
+    Script define(ScriptSource source);
 
     @Override
     default boolean test(Class<?> clazz) {
