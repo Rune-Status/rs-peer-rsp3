@@ -9,6 +9,8 @@ import org.rspeer.game.script.Script;
 import org.rspeer.game.script.ScriptController;
 import org.rspeer.game.script.event.ScriptChangeEvent;
 import org.rspeer.game.script.loader.ScriptSource;
+import org.rspeer.game.script.process.ScriptPool;
+import org.rspeer.game.script.process.ScriptProcess;
 import org.rspeer.ui.BotFrame;
 import org.rspeer.ui.component.script.ScriptSelector;
 
@@ -98,8 +100,8 @@ public class BotToolBar extends JToolBar {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ScriptSource source = controller.getSource();
-                Script active = controller.getPool().getActive();
-                if (source != null && active != null) {
+                ScriptPool pool = controller.getPool();
+                if (source != null && pool != null) {
                     controller.stop();
                     controller.setReload(true);
                 }

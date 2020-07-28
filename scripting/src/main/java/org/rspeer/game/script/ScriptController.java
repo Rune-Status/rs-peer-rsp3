@@ -9,19 +9,20 @@ import org.rspeer.game.script.loader.ScriptBundle;
 import org.rspeer.game.script.loader.ScriptLoaderProvider;
 import org.rspeer.game.script.loader.ScriptProvider;
 import org.rspeer.game.script.loader.ScriptSource;
+import org.rspeer.game.script.process.ScriptPool;
 import org.rspeer.game.script.process.ScriptProcess;
+import org.rspeer.game.script.situation.trigger.LoginSituationTrigger;
 
 public class ScriptController {
 
     private ScriptPool pool;
     private ScriptSource source;
-    private ScriptProcess process;
 
     private boolean reload;
 
     @Inject
-    public ScriptController(@Named("BotDispatcher") EventDispatcher environmentDispatcher) {
-        environmentDispatcher.subscribe(this);
+    public ScriptController(@Named("BotDispatcher") EventDispatcher dispatcher) {
+        dispatcher.subscribe(this);
     }
 
     public void start(ScriptProvider provider, ScriptSource source) {
@@ -30,22 +31,22 @@ public class ScriptController {
         }
 
         this.source = source;
-        pool = new ScriptPool(provider.define(source));
-        pool.getActive().setState(Script.State.STARTING);
-        pool.getActive().setState(Script.State.RUNNING);
 
-        process = ScriptProcess.Factory.provide(pool.getActive());
-        process.start();
+        Script script = provider.define(source);
+        script.setState(Script.State.STARTING);
+        script.setState(Script.State.RUNNING);
+
+        pool = new ScriptPool(ScriptProcess.Factory.provide(script));
+        pool.getActive().start();
+        pool.addPassive(new LoginSituationTrigger(this));
     }
 
     public void stop() {
         if (pool != null) {
-            pool.getActive().setState(Script.State.STOPPED);
+            pool.setState(Script.State.STOPPED);
+            pool.kill();
             pool = null;
         }
-
-        process.kill();
-        process = null;
         source = null;
     }
 
@@ -60,13 +61,12 @@ public class ScriptController {
     @Subscribe
     public void notify(ScriptChangeEvent e) {
         if (e.getState() == Script.State.STOPPED) {
-            if (process != null) {
+            if (pool != null) {
                 stop();
             }
 
             if (!reload) {
                 source = null;
-                process = null;
                 return;
             }
 
@@ -80,7 +80,6 @@ public class ScriptController {
                 start(loader, reloaded);
             } else {
                 source = null;
-                process = null;
             }
         }
     }
