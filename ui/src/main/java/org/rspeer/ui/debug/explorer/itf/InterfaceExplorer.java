@@ -1,11 +1,13 @@
 package org.rspeer.ui.debug.explorer.itf;
 
+import com.google.inject.Inject;
 import org.rspeer.commons.AWTUtil;
-import org.rspeer.environment.Environment;
+import org.rspeer.environment.preferences.BotPreferences;
 import org.rspeer.event.Subscribe;
 import org.rspeer.game.Game;
 import org.rspeer.game.component.Interfaces;
 import org.rspeer.game.event.RenderEvent;
+import org.rspeer.ui.BotFrame;
 import org.rspeer.ui.locale.Message;
 
 import javax.imageio.ImageIO;
@@ -31,8 +33,9 @@ public class InterfaceExplorer extends JFrame {
     private Object render = null;
     private Supplier<TreeModel> provider = new DefaultModelProvider();
 
-    public InterfaceExplorer(Environment environment) {
-        super(Message.INTERFACE_EXPLORER.getActive(environment.getPreferences()));
+    @Inject
+    public InterfaceExplorer(BotPreferences preferences, BotFrame frame) {
+        super(Message.INTERFACE_EXPLORER.getActive(preferences));
 
         try {
             setIconImage(ImageIO.read(getClass().getResource("/icon.png")));
@@ -78,9 +81,9 @@ public class InterfaceExplorer extends JFrame {
         });
 
         pack();
-        setMinimumSize(new Dimension(getWidth(), environment.getBotContext().getFrame().getHeight()));
+        setMinimumSize(new Dimension(getWidth(), frame.getFrame().getHeight()));
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(environment.getBotContext().getFrame());
+        setLocationRelativeTo(frame.getFrame());
         setVisible(true);
     }
 

@@ -3,17 +3,16 @@ package org.rspeer.game.component;
 import jag.RSNodeTable;
 import jag.game.RSInterfaceComponent;
 import jag.game.RSSubInterface;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Predicate;
 import org.rspeer.commons.Time;
 import org.rspeer.game.Game;
 import org.rspeer.game.Keyboard;
 import org.rspeer.game.adapter.component.InterfaceComponent;
 import org.rspeer.game.query.component.ComponentQuery;
 import org.rspeer.game.query.results.ComponentQueryResults;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Predicate;
 
 public class Dialog {
 
@@ -162,6 +161,6 @@ public class Dialog {
             return new ComponentQuery(Collections::emptyList);
         }
 
-        return new ComponentQuery(container::getSubComponents);
+        return new ComponentQuery(container::getSubComponents).filter(c -> c.getForeground() == 0);
     }
 }

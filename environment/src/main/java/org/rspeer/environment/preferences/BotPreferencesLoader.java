@@ -6,14 +6,7 @@ package org.rspeer.environment.preferences;
     Date: Sunday - 05/31/2020
 */
 
-import java.util.function.Consumer;
+public interface BotPreferencesLoader {
 
-public abstract class BotPreferencesLoader {
-
-    protected abstract BotPreferences load();
-
-    public final void load(Consumer<BotPreferences> later) {
-        BotPreferences result = load();
-        later.accept(result);
-    }
+    BotPreferences load();
 }

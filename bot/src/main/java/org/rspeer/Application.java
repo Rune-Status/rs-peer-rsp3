@@ -1,11 +1,9 @@
 package org.rspeer;
 
-import org.rspeer.commons.Configuration;
-import org.rspeer.environment.Environment;
-import org.rspeer.environment.preferences.BotPreferencesLoader;
-import org.rspeer.environment.preferences.JsonBotPreferencesLoader;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import org.rspeer.ui.BotFrame;
-import org.rspeer.ui.Window;
 import org.rspeer.ui.worker.LoadGameWorker;
 
 import javax.swing.*;
@@ -15,36 +13,23 @@ import javax.swing.*;
  */
 public class Application {
 
-    private final Environment environment;
+    private static final Injector injector = Guice.createInjector(new ApplicationModule());
 
-    public Application() {
-        environment = new Environment();
-    }
+    @Inject
+    private BotFrame botFrame;
 
+    @Inject
+    private LoadGameWorker loadGameWorker;
+    
     public static void main(String[] args) {
-        try {
-            Application application = new Application();
-            application.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Application application = injector.getInstance(Application.class);
+        application.start();
     }
 
     public void start() {
-        System.out.printf("Loading %s preferences%n", Configuration.getApplicationTitle());
-
-        BotPreferencesLoader preferencesLoader = new JsonBotPreferencesLoader();
-        preferencesLoader.load(preferences -> {
-            environment.setPreferences(preferences);
-            System.out.printf("Successfully loaded %s preferences%n", Configuration.getApplicationTitle());
-        });
-
         SwingUtilities.invokeLater(() -> {
-            Window<JFrame> ui = new BotFrame(environment);
-            ui.display();
-
-            LoadGameWorker loader = new LoadGameWorker(environment, ui);
-            loader.execute();
+            botFrame.display();
+            loadGameWorker.execute();
         });
     }
 }

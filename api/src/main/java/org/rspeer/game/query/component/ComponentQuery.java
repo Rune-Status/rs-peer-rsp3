@@ -2,19 +2,18 @@ package org.rspeer.game.query.component;
 
 import jag.game.RSClient;
 import jag.game.RSInterfaceComponent;
-import org.rspeer.commons.ArrayUtils;
-import org.rspeer.game.Game;
-import org.rspeer.game.adapter.component.InterfaceComponent;
-import org.rspeer.game.component.InterfaceComposite;
-import org.rspeer.game.query.Query;
-import org.rspeer.game.query.results.ComponentQueryResults;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import org.rspeer.commons.ArrayUtils;
+import org.rspeer.game.Game;
+import org.rspeer.game.adapter.component.InterfaceComponent;
+import org.rspeer.game.component.InterfaceComposite;
+import org.rspeer.game.query.Query;
+import org.rspeer.game.query.results.ComponentQueryResults;
 
 public class ComponentQuery extends Query<InterfaceComponent, ComponentQuery, ComponentQueryResults> {
 
@@ -43,6 +42,7 @@ public class ComponentQuery extends Query<InterfaceComponent, ComponentQuery, Co
 
     public ComponentQuery(boolean includeSubComponents) {
         this(() -> getInterfaces(visit(includeSubComponents)));
+        this.includeSubComponents = includeSubComponents;
     }
 
     public ComponentQuery() {

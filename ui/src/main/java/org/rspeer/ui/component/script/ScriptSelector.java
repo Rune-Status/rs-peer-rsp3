@@ -6,51 +6,39 @@ package org.rspeer.ui.component.script;
     Date: Tuesday - 06/02/2020
 */
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.RenderingHints;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import javax.imageio.ImageIO;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SwingWorker;
-import javax.swing.border.TitledBorder;
-
-import org.rspeer.environment.Environment;
-import org.rspeer.game.script.Script;
-import org.rspeer.game.script.event.ScriptChangeEvent;
+import org.rspeer.environment.preferences.BotPreferences;
+import org.rspeer.game.script.ScriptController;
 import org.rspeer.game.script.loader.ScriptBundle;
 import org.rspeer.game.script.loader.ScriptLoaderProvider;
 import org.rspeer.game.script.loader.ScriptProvider;
 import org.rspeer.game.script.loader.ScriptSource;
+import org.rspeer.ui.BotFrame;
 import org.rspeer.ui.Window;
 import org.rspeer.ui.component.layout.WrapLayout;
 import org.rspeer.ui.locale.Message;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+
 public class ScriptSelector extends Window<JDialog> {
 
-    private final Environment environment;
+    private final BotPreferences preferences;
+    private final BotFrame botFrame;
     private final Viewport viewport;
     private final ScriptProvider loader;
 
-    public ScriptSelector(JFrame parent, Environment environment) {
-        super(new JDialog(parent, Message.SCRIPT_SELECTOR.getActive(environment.getPreferences()), true));
-
+    public ScriptSelector(BotPreferences preferences, BotFrame botFrame, ScriptController controller) {
+        super(new JDialog(botFrame.getFrame(), Message.SCRIPT_SELECTOR.getActive(preferences), true));
+        this.botFrame = botFrame;
+        this.preferences = preferences;
         ScriptLoaderProvider provider = new ScriptLoaderProvider();
-        this.environment = environment;
-        this.viewport = initializeViewport();
+        this.viewport = initializeViewport(controller);
         this.loader = provider.get();
 
         try {
@@ -63,13 +51,13 @@ public class ScriptSelector extends Window<JDialog> {
 
         frame.pack();
         frame.setMinimumSize(frame.getSize());
-        frame.setLocationRelativeTo(environment.getBotContext().getFrame());
+        frame.setLocationRelativeTo(botFrame.getFrame());
     }
 
-    private Viewport initializeViewport() {
+    private Viewport initializeViewport(ScriptController controller) {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        Viewport viewport = new Viewport(environment);
+        Viewport viewport = new Viewport(controller);
 
         JScrollPane scroll = new JScrollPane(viewport);
         scroll.getVerticalScrollBar().setUnitIncrement(5);
@@ -194,11 +182,11 @@ public class ScriptSelector extends Window<JDialog> {
         public static final int DEFAULT_WIDTH = 200;
         public static final int DEFAULT_HEIGHT = 100;
 
-        private final Environment environment;
+        private final ScriptController controller;
         private final ScriptSource source;
 
-        public ScriptBox(Environment environment, ScriptSource source) {
-            this.environment = environment;
+        public ScriptBox(ScriptController controller, ScriptSource source) {
+            this.controller = controller;
             this.source = source;
 
             setLayout(new GridBagLayout());
@@ -216,10 +204,7 @@ public class ScriptSelector extends Window<JDialog> {
             button.setBorder(null);
 
             button.addActionListener(act -> {
-                environment.getScriptController().start(loader, source);
-                environment.getEventDispatcher().dispatch(
-                        new ScriptChangeEvent(source, Script.State.RUNNING, Script.State.STOPPED)
-                );
+                controller.start(loader, source);
                 dispose();
             });
 
@@ -237,15 +222,15 @@ public class ScriptSelector extends Window<JDialog> {
         private static final int HGAP = 4;
         private static final int VGAP = 4;
 
-        private final Environment environment;
+        private final ScriptController controller;
 
-        private Viewport(Environment environment) {
-            this.environment = environment;
+        private Viewport(ScriptController controller) {
+            this.controller = controller;
             setLayout(new WrapLayout(WrapLayout.LEFT, HGAP, VGAP));
         }
 
         private void addBox(ScriptSource source) {
-            add(new ScriptBox(environment, source));
+            add(new ScriptBox(controller, source));
         }
     }
 }

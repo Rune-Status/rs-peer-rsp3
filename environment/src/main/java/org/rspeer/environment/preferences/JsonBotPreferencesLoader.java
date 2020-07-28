@@ -1,16 +1,15 @@
 package org.rspeer.environment.preferences;
 
 import com.google.gson.stream.JsonReader;
-import org.rspeer.commons.Configuration;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import org.rspeer.commons.Configuration;
 
-public class JsonBotPreferencesLoader extends BotPreferencesLoader {
+public class JsonBotPreferencesLoader implements BotPreferencesLoader {
 
     @Override
-    protected BotPreferences load() {
+    public BotPreferences load() {
         File preferencesFile = Configuration.Paths.PREFERENCES_LOCATION.toFile();
         if (preferencesFile.exists()) {
             try (JsonReader reader = new JsonReader(new FileReader(preferencesFile))) {
