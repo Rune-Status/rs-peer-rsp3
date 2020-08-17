@@ -1,4 +1,4 @@
-package org.rspeer.ui.component.account;
+package org.rspeer.environment.account;
 
 public class AccountManager {
 

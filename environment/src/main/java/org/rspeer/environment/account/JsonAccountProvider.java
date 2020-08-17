@@ -1,4 +1,4 @@
-package org.rspeer.ui.component.account;
+package org.rspeer.environment.account;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -17,7 +17,7 @@ import java.util.List;
 //TODO this impl is temporary, this data will be stored server sided eventually to persist across different systems
 public class JsonAccountProvider extends AccountProvider {
 
-    private static final Type ACCOUNT_LIST_TYPE = new TypeToken<LinkedList<GameAccount>>() {}.getType();
+    private static final Type ACCOUNT_LIST_TYPE = new TypeToken<List<GameAccount>>() {}.getType();
     private static final String ACCOUNT_FILE_NAME = "account.dat";
     private static final String KEY = "what should we feed sphiinx today?";
 
@@ -25,6 +25,11 @@ public class JsonAccountProvider extends AccountProvider {
     protected void load() {
         File file = getFile();
         if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return;
         }
 
@@ -33,8 +38,8 @@ public class JsonAccountProvider extends AccountProvider {
             String json = new String(xor(data, KEY));
             Gson gson = new Gson();
             List<GameAccount> loaded = gson.fromJson(json, ACCOUNT_LIST_TYPE);
-            for (GameAccount account : loaded) {
-                add(account);
+            if (loaded != null) {
+                accounts.addAll(loaded);
             }
         } catch (JsonSyntaxException | IOException exception) {
             exception.printStackTrace();
@@ -45,7 +50,7 @@ public class JsonAccountProvider extends AccountProvider {
     protected void save() {
         File file = getFile();
         Gson gson = new Gson();
-        String json = gson.toJson(this, ACCOUNT_LIST_TYPE);
+        String json = gson.toJson(accounts, ACCOUNT_LIST_TYPE);
         byte[] data = xor(json.getBytes(), KEY);
         try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(data);

@@ -28,14 +28,6 @@ public class LocalScriptLoader implements ScriptProvider {
     @Override
     public ScriptBundle load() {
         ScriptBundle bundle = new ScriptBundle();
-        if (!Files.exists(root) || !Files.isDirectory(root)) {
-            try {
-                Files.createDirectories(root);
-            } catch (IOException e) {
-                return bundle;
-            }
-        }
-
         try (URLClassLoader rootLoader = URLClassLoader.newInstance(new URL[]{root.toUri().toURL()})) {
             Files.find(root,
                     Integer.MAX_VALUE,

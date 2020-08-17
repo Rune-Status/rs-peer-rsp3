@@ -1,4 +1,4 @@
-package org.rspeer.ui.component.account;
+package org.rspeer.environment.account;
 
 import org.rspeer.game.GameAccount;
 

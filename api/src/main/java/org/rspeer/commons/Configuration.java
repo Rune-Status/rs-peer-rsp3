@@ -1,5 +1,7 @@
 package org.rspeer.commons;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -21,5 +23,22 @@ public class Configuration {
         public static final Path SCRIPTS_LOCATION = HOME.resolve("scripts");
         public static final Path DATA_LOCATION = HOME.resolve("data");
         public static final Path PREFERENCES_LOCATION = HOME.resolve("preferences.json");
+
+        private static final Path[] DIRS = {
+                SCRIPTS_LOCATION,
+                DATA_LOCATION
+        };
+
+        static {
+            for (Path dir : DIRS) {
+                if (!Files.exists(dir) || !Files.isDirectory(dir)) {
+                    try {
+                        Files.createDirectories(dir);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 }
