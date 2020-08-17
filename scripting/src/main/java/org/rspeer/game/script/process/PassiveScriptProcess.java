@@ -6,8 +6,8 @@ import org.rspeer.game.script.Script;
 //TODO block interactions from this process?
 public class PassiveScriptProcess extends ScriptProcess {
 
-    public PassiveScriptProcess(Script script) {
-        super(script);
+    public PassiveScriptProcess(ScriptPool pool, Script script) {
+        super(pool, script);
     }
 
     @Override
@@ -17,6 +17,7 @@ public class PassiveScriptProcess extends ScriptProcess {
 
     @Override
     public void kill() {
+        script.setState(Script.State.STOPPED);
         executor.shutdown();
     }
 
@@ -25,6 +26,7 @@ public class PassiveScriptProcess extends ScriptProcess {
         Script.State state = script.getState();
         if (state == Script.State.PAUSED) {
             Time.sleep(100);
+            executor.submit(this);
             return;
         }
 

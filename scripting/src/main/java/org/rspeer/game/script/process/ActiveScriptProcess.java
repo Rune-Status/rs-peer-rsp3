@@ -4,10 +4,10 @@ import org.rspeer.commons.Time;
 import org.rspeer.game.Game;
 import org.rspeer.game.script.Script;
 
-public class DefaultScriptProcess extends ScriptProcess {
+public class ActiveScriptProcess extends ScriptProcess {
 
-    public DefaultScriptProcess(Script script) {
-        super(script);
+    public ActiveScriptProcess(ScriptPool pool, Script script) {
+        super(pool, script);
     }
 
     @Override
@@ -17,6 +17,7 @@ public class DefaultScriptProcess extends ScriptProcess {
 
     @Override
     public void kill() {
+        script.setState(Script.State.STOPPED);
         executor.shutdown();
     }
 
@@ -25,7 +26,14 @@ public class DefaultScriptProcess extends ScriptProcess {
         Script.State state = script.getState();
         if (state == Script.State.PAUSED) {
             Time.sleep(100);
+            executor.submit(this);
             return;
+        }
+
+        if (pool.getActive() == pool.getPrimary()) {
+            for (ScriptProcess passive : pool.getPassives()) {
+                passive.run();
+            }
         }
 
         if (state == Script.State.STOPPED) {

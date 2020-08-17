@@ -7,7 +7,10 @@ package org.rspeer.ui.component.script;
 */
 
 import org.rspeer.environment.preferences.BotPreferences;
-import org.rspeer.game.script.ScriptController;
+import org.rspeer.event.EventDispatcher;
+import org.rspeer.game.script.Script;
+import org.rspeer.game.script.event.ScriptChangeEvent;
+import org.rspeer.game.script.process.ScriptController;
 import org.rspeer.game.script.loader.ScriptBundle;
 import org.rspeer.game.script.loader.ScriptLoaderProvider;
 import org.rspeer.game.script.loader.ScriptProvider;
@@ -28,17 +31,19 @@ import java.util.concurrent.ExecutionException;
 
 public class ScriptSelector extends Window<JDialog> {
 
-    private final BotPreferences preferences;
-    private final BotFrame botFrame;
+    private final EventDispatcher dispatcher;
     private final Viewport viewport;
     private final ScriptProvider loader;
 
-    public ScriptSelector(BotPreferences preferences, BotFrame botFrame, ScriptController controller) {
+    public ScriptSelector(EventDispatcher dispatcher,
+            BotPreferences preferences,
+            BotFrame botFrame,
+            ScriptController controller) {
         super(new JDialog(botFrame.getFrame(), Message.SCRIPT_SELECTOR.getActive(preferences), true));
-        this.botFrame = botFrame;
-        this.preferences = preferences;
-        ScriptLoaderProvider provider = new ScriptLoaderProvider();
+        this.dispatcher = dispatcher;
         this.viewport = initializeViewport(controller);
+
+        ScriptLoaderProvider provider = new ScriptLoaderProvider();
         this.loader = provider.get();
 
         try {
@@ -204,6 +209,7 @@ public class ScriptSelector extends Window<JDialog> {
             button.setBorder(null);
 
             button.addActionListener(act -> {
+                dispatcher.dispatch(new ScriptChangeEvent(source, Script.State.RUNNING, Script.State.STOPPED));
                 controller.start(loader, source);
                 dispose();
             });

@@ -1,16 +1,15 @@
-package org.rspeer.game.script;
+package org.rspeer.game.script.process;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.rspeer.event.EventDispatcher;
 import org.rspeer.event.Subscribe;
+import org.rspeer.game.script.Script;
 import org.rspeer.game.script.event.ScriptChangeEvent;
 import org.rspeer.game.script.loader.ScriptBundle;
 import org.rspeer.game.script.loader.ScriptLoaderProvider;
 import org.rspeer.game.script.loader.ScriptProvider;
 import org.rspeer.game.script.loader.ScriptSource;
-import org.rspeer.game.script.process.ScriptPool;
-import org.rspeer.game.script.process.ScriptProcess;
 import org.rspeer.game.script.situation.trigger.LoginSituationTrigger;
 
 public class ScriptController {
@@ -36,9 +35,13 @@ public class ScriptController {
         script.setState(Script.State.STARTING);
         script.setState(Script.State.RUNNING);
 
-        pool = new ScriptPool(ScriptProcess.Factory.provide(script));
+        pool = new ScriptPool();
+        pool.setPrimary(ScriptProcess.Factory.provide(pool, script));
         pool.getActive().start();
-        pool.addPassive(new LoginSituationTrigger(this));
+
+        if (script.getAccount() != null) {
+            pool.addPassive(new LoginSituationTrigger(this));
+        }
     }
 
     public void stop() {
@@ -48,6 +51,10 @@ public class ScriptController {
             pool = null;
         }
         source = null;
+    }
+
+    public Script getActive() {
+        return pool.getPrimary().script;
     }
 
     public ScriptSource getSource() {

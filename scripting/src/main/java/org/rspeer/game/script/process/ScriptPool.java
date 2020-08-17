@@ -2,19 +2,18 @@ package org.rspeer.game.script.process;
 
 import org.rspeer.game.script.Script;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ScriptPool {
 
-    private final ScriptProcess primary;
     private final Set<ScriptProcess> passives;
 
+    private ScriptProcess primary;
     private ScriptProcess active;
 
-    public ScriptPool(ScriptProcess primary) {
-        this.primary = primary;
-        this.active = primary;
+    public ScriptPool() {
         this.passives = new HashSet<>();
     }
 
@@ -22,21 +21,42 @@ public class ScriptPool {
         return primary;
     }
 
+    public void setPrimary(ScriptProcess primary) {
+        if (this.primary != null) {
+            throw new IllegalStateException();
+        }
+        this.primary = primary;
+        this.active = primary;
+    }
+
     public ScriptProcess getActive() {
         return active;
     }
 
     public void setActive(Script script) {
-        setActive(ScriptProcess.Factory.provide(script));
+        setActive(ScriptProcess.Factory.provide(this, script));
     }
 
     //TODO pause prev process and run passed one
     public void setActive(ScriptProcess active) {
+        setState(Script.State.PAUSED);
+
         this.active = active;
+        if (active.script.getState() == Script.State.STOPPED) {
+            setState(Script.State.STARTING);
+            setState(Script.State.RUNNING);
+        } else if (active.script.getState() == Script.State.PAUSED) {
+            setState(Script.State.RUNNING);
+        }
+        active.start();
     }
 
     public void setState(Script.State state) {
         active.script.setState(state);
+    }
+
+    public Set<ScriptProcess> getPassives() {
+        return Collections.unmodifiableSet(passives);
     }
 
     public void addPassive(Script... scripts) {
@@ -44,7 +64,11 @@ public class ScriptPool {
             if (!script.getMeta().passive()) {
                 throw new IllegalArgumentException();
             }
-            passives.add(ScriptProcess.Factory.provide(script));
+            ScriptProcess process = ScriptProcess.Factory.provide(this, script);
+            passives.add(process);
+            script.setState(Script.State.STARTING);
+            script.setState(Script.State.RUNNING);
+            process.start();
         }
     }
 

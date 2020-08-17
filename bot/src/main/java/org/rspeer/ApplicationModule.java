@@ -5,7 +5,7 @@ import com.google.inject.name.Names;
 import org.rspeer.environment.preferences.BotPreferences;
 import org.rspeer.environment.preferences.JsonBotPreferencesLoader;
 import org.rspeer.event.EventDispatcher;
-import org.rspeer.game.script.ScriptController;
+import org.rspeer.game.script.process.ScriptController;
 import org.rspeer.ui.BotFrame;
 import org.rspeer.ui.component.menu.BotMenuBar;
 

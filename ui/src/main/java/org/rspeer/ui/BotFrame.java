@@ -9,7 +9,7 @@ import org.rspeer.environment.preferences.type.AlwaysOnTopPreference;
 import org.rspeer.environment.preferences.type.SceneRenderPreference;
 import org.rspeer.event.EventDispatcher;
 import org.rspeer.event.Subscribe;
-import org.rspeer.game.script.ScriptController;
+import org.rspeer.game.script.process.ScriptController;
 import org.rspeer.ui.component.menu.BotMenuBar;
 import org.rspeer.ui.component.menu.BotToolBar;
 import org.rspeer.ui.component.splash.Splash;

@@ -31,6 +31,10 @@ public class GameAccount {
         );
     }
 
+    public boolean validate() {
+        return !details.username.isEmpty() && !details.password.isEmpty();
+    }
+
     public Details getDetails() {
         return details;
     }
