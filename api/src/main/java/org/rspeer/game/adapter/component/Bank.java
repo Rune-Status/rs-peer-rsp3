@@ -58,7 +58,7 @@ public class Bank extends Inventory {
 
         if (item != null) {
             if (amount <= 1) {
-                item.interact(baseAction + "-1");
+                item.interact(baseAction + "1");
                 return true;
             }
 
