@@ -10,11 +10,11 @@ import org.rspeer.environment.preferences.BotPreferences;
 import org.rspeer.event.EventDispatcher;
 import org.rspeer.game.script.Script;
 import org.rspeer.game.script.event.ScriptChangeEvent;
-import org.rspeer.game.script.process.ScriptController;
 import org.rspeer.game.script.loader.ScriptBundle;
 import org.rspeer.game.script.loader.ScriptLoaderProvider;
 import org.rspeer.game.script.loader.ScriptProvider;
 import org.rspeer.game.script.loader.ScriptSource;
+import org.rspeer.game.script.process.ScriptController;
 import org.rspeer.ui.BotFrame;
 import org.rspeer.ui.Window;
 import org.rspeer.ui.component.layout.WrapLayout;
@@ -209,8 +209,8 @@ public class ScriptSelector extends Window<JDialog> {
             button.setBorder(null);
 
             button.addActionListener(act -> {
-                dispatcher.dispatch(new ScriptChangeEvent(source, Script.State.RUNNING, Script.State.STOPPED));
                 controller.start(loader, source);
+                dispatcher.dispatch(new ScriptChangeEvent(controller.getActive(), Script.State.RUNNING));
                 dispose();
             });
 

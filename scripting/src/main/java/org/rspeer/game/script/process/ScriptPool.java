@@ -1,6 +1,8 @@
 package org.rspeer.game.script.process;
 
+import org.rspeer.event.EventDispatcher;
 import org.rspeer.game.script.Script;
+import org.rspeer.game.script.event.ScriptChangeEvent;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -8,12 +10,14 @@ import java.util.Set;
 
 public class ScriptPool {
 
+    private final EventDispatcher dispatcher;
     private final Set<ScriptProcess> passives;
 
     private ScriptProcess primary;
     private ScriptProcess active;
 
-    public ScriptPool() {
+    public ScriptPool(EventDispatcher dispatcher) {
+        this.dispatcher = dispatcher;
         this.passives = new HashSet<>();
     }
 
@@ -25,8 +29,11 @@ public class ScriptPool {
         if (this.primary != null) {
             throw new IllegalStateException();
         }
+        
         this.primary = primary;
         this.active = primary;
+
+        primary.stateCallback = state -> dispatcher.dispatch(new ScriptChangeEvent(primary.script, state));
     }
 
     public ScriptProcess getActive() {

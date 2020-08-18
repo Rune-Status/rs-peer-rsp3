@@ -4,12 +4,15 @@ import org.rspeer.game.script.Script;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 public abstract class ScriptProcess implements Runnable {
 
     protected final ScriptPool pool;
     protected final Script script;
     protected final ExecutorService executor;
+
+    protected Consumer<Script.State> stateCallback = x -> {};
 
     protected ScriptProcess(ScriptPool pool, Script script, ExecutorService executor) {
         this.pool = pool;

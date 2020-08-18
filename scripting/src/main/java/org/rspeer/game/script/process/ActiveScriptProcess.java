@@ -45,6 +45,7 @@ public class ActiveScriptProcess extends ScriptProcess {
         int sleep = script.loop();
         if (sleep < 0) {
             script.setState(Script.State.STOPPED);
+            stateCallback.accept(Script.State.STOPPED);
             return;
         }
 

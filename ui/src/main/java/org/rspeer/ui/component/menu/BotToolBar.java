@@ -34,11 +34,7 @@ public class BotToolBar extends JToolBar {
                 ScriptSelector selector = new ScriptSelector(dispatcher, preferences, frame, controller);
                 selector.display();
             } else {
-                dispatcher.dispatch(new ScriptChangeEvent(
-                        controller.getSource(),
-                        Script.State.STOPPED,
-                        Script.State.RUNNING
-                ));
+                dispatcher.dispatch(new ScriptChangeEvent(controller.getActive(), Script.State.STOPPED));
                 controller.stop();
             }
         });

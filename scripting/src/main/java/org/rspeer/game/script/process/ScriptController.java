@@ -14,6 +14,7 @@ import org.rspeer.game.script.situation.trigger.LoginSituationTrigger;
 
 public class ScriptController {
 
+    private final EventDispatcher dispatcher;
     private ScriptPool pool;
     private ScriptSource source;
 
@@ -21,6 +22,7 @@ public class ScriptController {
 
     @Inject
     public ScriptController(@Named("BotDispatcher") EventDispatcher dispatcher) {
+        this.dispatcher = dispatcher;
         dispatcher.subscribe(this);
     }
 
@@ -35,7 +37,7 @@ public class ScriptController {
         script.setState(Script.State.STARTING);
         script.setState(Script.State.RUNNING);
 
-        pool = new ScriptPool();
+        pool = new ScriptPool(dispatcher);
         pool.setPrimary(ScriptProcess.Factory.provide(pool, script));
         pool.getActive().start();
 

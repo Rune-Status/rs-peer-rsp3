@@ -4,15 +4,15 @@ import org.rspeer.event.Event;
 import org.rspeer.game.script.Script;
 import org.rspeer.game.script.loader.ScriptSource;
 
-public class ScriptChangeEvent extends Event<ScriptSource> {
+public class ScriptChangeEvent extends Event<Script> {
 
     private final Script.State state;
     private final Script.State previousState;
 
-    public ScriptChangeEvent(ScriptSource source, Script.State state, Script.State previousState) {
-        super(source);
-        this.state = state;
-        this.previousState = previousState;
+    public ScriptChangeEvent(Script script, Script.State newState) {
+        super(script);
+        this.state = newState;
+        this.previousState = script.getState();
     }
 
     public Script.State getPreviousState() {
